@@ -1,0 +1,47 @@
+# Voice Assistance 
+#Language : Python
+import speech_recognition as sr
+from chatterbot import ChatBot
+import os
+from chatterbot.trainers import ListTrainer
+import pyttsx3
+engine=pyttsx3.init()
+#speech to text convertion
+r=sr.Recognizer()
+if not isinstance(r, sr.Recognizer):
+    raise TypeError()
+
+if not isinstance(sr.Microphone(), sr.Microphone):
+    raise TypeError()
+
+print("Say Hello")
+with sr.Microphone()as source:
+    r.adjust_for_ambient_noise(source)
+    
+    audio=r.listen(source)
+    
+try:
+    print('Your input is:'+r.recognize_google(audio))
+##except sr.UnknownValueError:
+##    print("Unable to recognize speech")
+except:
+    print("Sorry,i couldn't get you")
+#checking with the database
+bot=ChatBot("chatbot")
+conv=open(r'C:/Users/admin/Documents/data.txt','r').readlines()#replce with the path of your data 
+bot.set_trainer(ListTrainer)
+bot.train(conv)
+#text to speech convertion
+while True:
+    message=r.recognize_google(audio)
+    if message=="hello":
+            reply=bot.get_response(message)
+            if reply.confidence>0.7:
+                print("Bot's reply is:",reply)
+                engine.say(reply)
+                engine.setProperty('rate',120)
+                engine.setProperty('volume',1)
+                print(reply.confidence)
+                break
+engine.runAndWait()
+#4if__name__=='__main__': main()
